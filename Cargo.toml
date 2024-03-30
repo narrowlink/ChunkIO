@@ -12,6 +12,5 @@ readme = 'README.md'
 [dependencies]
 thiserror = { version = "1.0", default-features = false }
 futures = { version = "0.3", default-features = false }
-future-utils = { version = "0.12", default-features = false }
 tokio = { version = "1.37", default-features = false }
 tokio-util = { version = "0.7", features = ["codec"], default-features = false }

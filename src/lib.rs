@@ -5,7 +5,7 @@ use std::{
 };
 
 use error::ChunkIOError;
-use futures::{Stream, StreamExt};
+use futures::{Sink, SinkExt, Stream, StreamExt};
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio_util::{
     bytes::{Buf, BytesMut},
@@ -33,6 +33,30 @@ where
         self.0.poll_next_unpin(cx)
     }
 }
+
+impl<T> Sink<Vec<u8>> for ChunkIO<T>
+where
+    T: AsyncRead + AsyncWrite + Unpin,
+{
+    type Error = ChunkIOError;
+
+    fn poll_ready(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
+        self.0.poll_ready_unpin(cx)
+    }
+
+    fn start_send(mut self: Pin<&mut Self>, item: Vec<u8>) -> Result<(), Self::Error> {
+        self.0.start_send_unpin(item)
+    }
+
+    fn poll_flush(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
+        self.0.poll_flush_unpin(cx)
+    }
+
+    fn poll_close(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
+        self.0.poll_close_unpin(cx)
+    }
+}
+
 #[derive(Default)]
 struct ChunkIOProto {
     current_index: (u64, u64), // send index, receive index
