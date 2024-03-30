@@ -1,0 +1,17 @@
+[package]
+authors = ['Narrowlink <opensource@narrowlink.com>']
+description = "A chunked stream protocol that allows for sending and receiving chunks of data asynchronously over an I/O system."
+name = "chunkio"
+version = "0.0.1"
+edition = "2021"
+license = "Apache-2.0"
+repository = 'https://github.com/narrowlink/ipstack'
+homepage = "https://narrowlink.com/"
+readme = 'README.md'
+
+[dependencies]
+thiserror = { version = "1.0", default-features = false }
+futures = { version = "0.3", default-features = false }
+future-utils = { version = "0.12", default-features = false }
+tokio = { version = "1.37", default-features = false }
+tokio-util = { version = "0.7", features = ["codec"], default-features = false }
