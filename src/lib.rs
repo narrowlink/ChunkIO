@@ -71,8 +71,8 @@ impl Decoder for ChunkIOProto {
         if src.len() < 2 {
             return Ok(None);
         }
-        let index_pointer = (src[0] & 0xf0) as u64;
-        let len_pointer = (src[0] & 0x7f) as u64;
+        let index_pointer = (src[0] >> 4) as u64;
+        let len_pointer = (src[0] & 0xf) as u64;
         if index_pointer > 8 || len_pointer > 8 || len_pointer == 0 {
             return Err(ChunkIOError::InvalidChunk);
         }
@@ -95,7 +95,6 @@ impl Decoder for ChunkIOProto {
             ),
             _ => return Err(ChunkIOError::InvalidChunk),
         };
-
         if self.current_index.1 != index {
             return Err(ChunkIOError::OutOfOrder);
         }
@@ -116,12 +115,15 @@ impl Decoder for ChunkIOProto {
                     .try_into()
                     .or(Err(ChunkIOError::InvalidChunk))?,
             ),
-            _ => return Err(ChunkIOError::InvalidChunk),
+            _ => {
+                return Err(ChunkIOError::InvalidChunk);
+            }
         };
         if src.len() < (index_pointer + len_pointer + length + 1) as usize {
             Ok(None)
         } else {
             src.advance((index_pointer + len_pointer + 1) as usize);
+            self.current_index.1 += length;
             Ok(Some(src.split_to(length as usize).to_vec()))
         }
     }
@@ -138,12 +140,11 @@ impl Encoder<Vec<u8>> for ChunkIOProto {
             .into_iter()
             .skip_while(|x| *x == 0)
             .collect::<Vec<u8>>();
-
         let length = item
             .len()
             .to_be_bytes()
             .into_iter()
-            .skip_while(|x| x == &0)
+            .skip_while(|x| *x == 0)
             .collect::<Vec<u8>>();
         dst.extend_from_slice(&[((index.len() as u8) << 4) | (length.len() as u8)]);
         dst.extend_from_slice(&index);
