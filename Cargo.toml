@@ -5,7 +5,7 @@ name = "chunkio"
 version = "0.0.1"
 edition = "2021"
 license = "Apache-2.0"
-repository = 'https://github.com/narrowlink/ipstack'
+repository = 'https://github.com/narrowlink/chunkio'
 homepage = "https://narrowlink.com/"
 readme = 'README.md'
 
